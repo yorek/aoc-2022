@@ -52,4 +52,5 @@ from
 
 -- Part 1 Result
 select sum(player_value + outcome) from #results
-GO
+
+-- 13052

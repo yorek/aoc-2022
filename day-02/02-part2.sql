@@ -75,7 +75,6 @@ from
 
 --select *, player_value + outcome as round_total from #results order by id;
 
-
 -- Part 2 Result
 select sum(player_value + outcome) from #results
 
