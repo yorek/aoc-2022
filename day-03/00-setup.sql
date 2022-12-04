@@ -300,7 +300,7 @@ rslllhJjcQNNGjpWJlSRTRdwBVSSNTPVSdPB
 jGrGqjJfqccrfqGcGplrJpFvzggqmCtMzmsMnvMvvCgm';
 
 drop table if exists dbo.ch03_input;
-create table ch03_input 
+create table dbo.ch03_input 
 (
     id int identity not null primary key,
     items varchar(100) collate Latin1_General_BIN2
