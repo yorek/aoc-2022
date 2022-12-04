@@ -2509,5 +2509,5 @@ select
     left([round], 1) as [opponent], 
     right([round], 1) as [player] 
 into 
-    [ch02_input]
+    dbo.[ch02_input]
 from cte;
