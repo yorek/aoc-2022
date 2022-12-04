@@ -14,7 +14,7 @@ from
     ch03_input;
 go
 
--- select * from #step1
+-- select * from #step1 order by id
 
 -- create a numbers table
 drop table if exists #n;
@@ -36,7 +36,7 @@ where
     n.n <= s.itemcount
 go
 
---select * from #step2
+--select * from #step2 order by id
 
 -- get which item is present in both compartements
 drop table if exists #step3;
@@ -55,7 +55,7 @@ and
 order by id
 go
 
---select * from #step3
+--select * from #step3 order by id
 
 -- calculate the priority for reach elf
 drop table if exists #priorities;
