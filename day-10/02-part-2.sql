@@ -32,13 +32,12 @@ go
 -- aggregate
 select 
     [line],
-    string_agg(crt_char, '') as crt_line
+    string_agg(crt_char, '') within group (order by cycle) as crt_line
 from 
     #crt_lines 
 group by
     [line]
-option
-    (maxdop 1)
+
 
 -- PZGPKPEB
 

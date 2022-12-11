@@ -88,7 +88,7 @@ select
     command_cycles,
     start_cycle,
     end_cycle, 
-    n as [cycle],
+    n.[value] as [cycle],
     start_value,
     end_value
 into
@@ -96,8 +96,8 @@ into
 from
     #command_details cd
 inner join
-    #numbers n on n-1 >= cd.start_cycle and n <= cd.end_cycle
-order by n;
+    generate_series(1, 10000) n on n.[value]-1 >= cd.start_cycle and n.value <= cd.end_cycle
+order by n.[value];
 
 -- Calculate signal strength
 select 
