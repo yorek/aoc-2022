@@ -19,6 +19,7 @@ from (values
 go
 
 --select * from dbo.#input_monkeys
+go
 
 drop table if exists #input_values;
 with cte as
@@ -47,6 +48,7 @@ go
 --select * from dbo.#input_values
 go
 
+-- Prepare a table to contain rounds data
 drop table if exists #round;
 select 
     0 as [added_in_round], -- when the item was added
@@ -59,18 +61,20 @@ from
 ;
 
 --select * from #round;
-declare @m int = 0, @r int = 0;
+go
 
-while (@r < 20)
+declare @m int = 0, @r int = 0;
+while (@r < 20) -- Run for 20 rounds
 begin
     print @r
     set @m = 0;
-    while (@m < 8)
+    while (@m < 8) -- Process each one of the 8 monkeys on its own, in sequence
     begin
         drop table if exists #temp;
 
         ;with cte as
         (
+            -- calculate the values used in the operation for calculating the new worry level
             select 
                 cast(iif(op1 = 'old', item, null) as bigint) as op1_final,
                 cast(iif(op2 = 'old', item, op2) as bigint) as op2_final,
@@ -86,6 +90,7 @@ begin
         ),
         cte2 as
         (
+            -- calculate the worry level
             select
                 floor(cast(case op 
                     when '*' then cast(op1_final as bigint) * cast(op2_final as bigint) 
@@ -97,12 +102,14 @@ begin
         ),
         cte3 as 
         (
+            -- run the division test and assignt he item to the monkey based on the test result
             select        
                 case when worry_level % test = 0 then [true] else [false] end as dest_monkey,
                 *
             from
                 cte2
         )    
+        -- determine if the assigned monkey can handle the item right in this round or the next
         select
             case when dest_monkey <= monkey then round + 1 else round end as next_round,
             *
@@ -113,6 +120,7 @@ begin
 
         --select * from #temp;
 
+        -- prepare data for next round
         insert into #round         
             ([added_in_round], round, monkey, item)
         select 
@@ -120,14 +128,15 @@ begin
         from 
             #temp ;
         
-        set @m += 1;
+        set @m += 1; -- process next monkey
     end
-    set @r += 1;
+    set @r += 1; -- process next round
 end
 
 --select * from #round where round = 19 order by monkey
 go
 
+-- get the two most active monkeys
 with cte as
 (
     select 
@@ -141,6 +150,7 @@ with cte as
 )
 select * from cte order by total desc
 
+-- calculate the solution
 select 318 * 314
 
 -- 99852

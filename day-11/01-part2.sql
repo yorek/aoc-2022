@@ -19,6 +19,7 @@ from (values
 go
 
 --select * from dbo.#input_monkeys
+go
 
 drop table if exists #input_values;
 with cte as
@@ -44,44 +45,10 @@ from
 cross apply openjson (items)
 go
 
--- drop table if exists #input_monkeys;
--- select  
---     *
--- into
---     #input_monkeys
--- from (values
---         (0, 'old', '*', '19', 23, 2, 3),
---         (1, 'old', '+', '6', 19, 2, 0),
---         (2, 'old', '*', 'old', 13, 1, 3),
---         (3, 'old', '+', '3', 17, 0, 1)
---     ) T (monkey, op1, op, op2, test, [true], [false])
--- go
-
--- --select * from dbo.#input_monkeys
-
--- drop table if exists #input_values;
--- select  
---       monkey,
---     cast([item] as bigint) as item
--- into
---     #input_values
--- from (values
---         (0, 79),
---         (0, 98),
---         (1, 54), 
---         (1, 65), 
---         (1, 75), 
---         (1, 74), 
---         (2, 79),
---         (2, 60),
---         (2, 97),
---         (3, 74)) T (monkey, item)
--- go
-
-
 --select * from dbo.#input_values
 go
 
+-- Prepare a table to contain rounds data
 drop table if exists #round;
 select 
     0 as [added_in_round], -- when the item was added
@@ -93,21 +60,25 @@ from
     #input_values
 ;
 
-create clustered index ixc on #round(round, monkey);
-
 --select * from #round;
-declare @m int = 0, @r int = 0;
+go
 
-while (@r < 10000 )
+-- create index to support performances
+create clustered index ixc on #round(round, monkey);
+go
+
+declare @m int = 0, @r int = 0;
+while (@r < 10000 ) -- Run for 10000 rounds
 begin
     print @r
     set @m = 0;
-    while (@m < 8)
+    while (@m < 8) -- Process each one of the 8 monkeys on its own, in sequence
     begin
         drop table if exists #temp;
 
         ;with cte as
         (
+            -- calculate the values used in the operation for calculating the new worry level
             select 
                 cast(iif(op1 = 'old', item, null) as decimal(38,0)) as op1_final,
                 cast(iif(op2 = 'old', item, op2) as decimal(38,0)) as op2_final,
@@ -123,23 +94,26 @@ begin
         ),
         cte2 as
         (
+            -- calculate the worry level using updated algorithm
             select
                 (cast(case op 
                     when '*' then cast(op1_final as decimal(38,10)) * cast(op2_final as decimal(38,10)) 
                     when '+' then cast(op1_final as decimal(38,10)) + cast(op2_final as decimal(38,10)) 
-                end as decimal(38,10)) % 9699690) as worry_level,
+                end as decimal(38,10)) % 9699690) as worry_level, -- switch to use LCM of divisors and module operation to avoid overflows
                 *
             from
                 cte
         ),
         cte3 as 
         (
+            -- run the division test and assignt he item to the monkey based on the test result
             select        
                 case when worry_level % test = 0 then [true] else [false] end as dest_monkey,
                 *
             from
                 cte2
         )    
+        -- determine if the assigned monkey can handle the item right in this round or the next
         select
             case when dest_monkey <= monkey then round + 1 else round end as next_round,
             *
@@ -150,6 +124,7 @@ begin
 
         --select * from #temp;
 
+        -- prepare data for next round
         insert into #round         
             ([added_in_round], round, monkey, item)
         select 
@@ -157,16 +132,15 @@ begin
         from 
             #temp ;
         
-        set @m += 1;
+        set @m += 1; -- process next monkey
     end
-    set @r += 1;
+    set @r += 1; -- process next round
 end
 
--- select * from #round 
--- where round = 0
--- order by monkey
--- go
+--select * from #round where round = 9999 order by monkey
+go
 
+-- get the two most active monkeys
 ;with cte as
 (
     select 
@@ -180,6 +154,7 @@ end
 )
 select * from cte order by  total desc
 
+-- calculate the solution
 select cast(161523 as bigint) * cast(160567 as bigint)
 
 -- 25935263541
