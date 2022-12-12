@@ -15,4 +15,5 @@ Details on the solution, where I share the learnings resulting from solving the 
 - [Day 07] - N/A
 - [Day 08] - N/A
 - [Day 09] - N/A
-- [Day 10] - Solution is in, article coming soon - Relevant learnings: non-equi join, range expansion
+- [Day 10](https://dev.to/azure/advent-of-code-day-10-4n71) - Relevant learnings: non-equi join, range expansion
+- [Day 11] - Solution is in, article coming soon - Relevant learnings: non-equi join, range expansion
