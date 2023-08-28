@@ -16,4 +16,6 @@ Details on the solution, where I share the learnings resulting from solving the 
 - Day 08 - N/A
 - Day 09 - N/A
 - [Day 10](https://dev.to/azure/advent-of-code-day-10-4n71) - non-equi join, range expansion, ordered string_agg, generate_series
-- [Day 11] - Solution is in, article TDB
+- Day 11 - Solution is in, article TDB
+
+Unfortunately I couldn't complete all challenges, as between work, family and festivities I coulnd't find enough time to spare for this, but I'll try again next year :) It is always a learning experience.
